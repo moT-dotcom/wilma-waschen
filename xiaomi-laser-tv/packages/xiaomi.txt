@@ -1,0 +1,19 @@
+# Profil "xiaomi" – Werbung, Telemetrie und Extras der Xiaomi-Firmware
+# (PatchWall / MIUI TV). Paketnamen unterscheiden sich je nach Modell und
+# Region: Das Skript fasst nur an, was auf deinem Gerät wirklich installiert
+# ist. Launcher (com.mitv.tvhome*), HDMI/TV-Dienste und Bildverarbeitung sind
+# in lib.sh fest geschützt.
+#
+# Nach 00-inventory.sh bitte gegen die Liste "Xiaomi/PatchWall-Pakete" prüfen
+# und hier ergänzen.
+com.xiaomi.mitv.advertise                    # Werbeeinblendungen
+com.xiaomi.ad                                # Werbe-SDK
+com.miui.systemAdSolution                    # Werbe-Framework
+com.miui.tv.analytics                        # Telemetrie
+com.xiaomi.statistic                         # Nutzungsstatistik
+com.xiaomi.mitv.tvpush.tvpushservice         # Push-Benachrichtigungen / Promo
+com.xiaomi.mitv.screensaver                  # Werbe-/Foto-Bildschirmschoner
+com.xiaomi.mitv.karaoke                      # Karaoke
+com.duokan.videodaily                        # Video-Feed
+com.xiaomi.gamecenter                        # Game Center
+com.xiaomi.mitv.shop                         # Shop

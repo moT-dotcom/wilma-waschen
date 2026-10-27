@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xiaomi Laser TV optimieren</title>
+<meta name="description" content="Xiaomi 4K Laser TV entschlacken, schneller machen, Zwischenbildberechnung richtig nutzen und das Apple-TV-Bild für Hyperion auf dem Raspberry Pi abgreifen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #eef0f4;
+    --text: #14161a;
+    --muted: #5b6270;
+    --border: #dde1e8;
+    --accent: #ff6900;
+    --accent-soft: #fff0e5;
+    --ok: #1a7f4b;
+    --ok-soft: #e6f5ec;
+    --warn: #a35b00;
+    --warn-soft: #fff4e0;
+    --bad: #b42318;
+    --bad-soft: #fdecea;
+    --code-bg: #14161a;
+    --code-text: #e7e9ee;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e0f12;
+      --surface: #16181d;
+      --surface-2: #1d2027;
+      --text: #eceef2;
+      --muted: #9aa1ad;
+      --border: #2a2e37;
+      --accent: #ff7a1a;
+      --accent-soft: #2a1a0d;
+      --ok: #4cc38a;
+      --ok-soft: #10261b;
+      --warn: #f0a73a;
+      --warn-soft: #2a1f0c;
+      --bad: #f2776c;
+      --bad-soft: #2c1412;
+      --code-bg: #0a0b0d;
+      --code-text: #e7e9ee;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e0f12;
+    --surface: #16181d;
+    --surface-2: #1d2027;
+    --text: #eceef2;
+    --muted: #9aa1ad;
+    --border: #2a2e37;
+    --accent: #ff7a1a;
+    --accent-soft: #2a1a0d;
+    --ok: #4cc38a;
+    --ok-soft: #10261b;
+    --warn: #f0a73a;
+    --warn-soft: #2a1f0c;
+    --bad: #f2776c;
+    --bad-soft: #2c1412;
+    --code-bg: #0a0b0d;
+    --code-text: #e7e9ee;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+
+  header.hero { padding: 56px 0 32px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+  h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.1; margin: 8px 0 16px; letter-spacing: -.02em; }
+  .lead { color: var(--muted); font-size: 18px; max-width: 640px; margin: 0; }
+
+  nav.toc {
+    position: sticky; top: 0; z-index: 5;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.toc ol {
+    list-style: none; margin: 0; padding: 10px 16px; display: flex; gap: 6px;
+    overflow-x: auto; max-width: 860px; margin: 0 auto; scrollbar-width: none;
+  }
+  nav.toc a {
+    display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+    padding: 6px 12px; border-radius: 999px; font-size: 14px; font-weight: 500;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--text); }
+
+  section { padding: 40px 0 8px; scroll-margin-top: 56px; }
+  h2 { font-size: 26px; margin: 0 0 6px; letter-spacing: -.01em; display: flex; align-items: center; gap: 12px; }
+  h2 .num {
+    flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+    background: var(--accent); color: #fff; font-size: 16px;
+  }
+  h3 { font-size: 18px; margin: 28px 0 8px; }
+  p.sub { color: var(--muted); margin: 0 0 18px; }
+
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;
+  }
+  .card h4 { margin: 0 0 6px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .badge {
+    display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; margin-bottom: 10px;
+  }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.bad { background: var(--bad-soft); color: var(--bad); }
+
+  .callout {
+    border-left: 4px solid var(--accent); background: var(--accent-soft);
+    padding: 14px 16px; border-radius: 0 10px 10px 0; margin: 16px 0;
+  }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout.bad { border-color: var(--bad); background: var(--bad-soft); }
+  .callout strong:first-child { display: block; margin-bottom: 2px; }
+
+  ol.steps { padding-left: 22px; }
+  ol.steps li { margin: 6px 0; }
+  kbd {
+    font: 500 13px "JetBrains Mono", monospace; background: var(--surface-2); border: 1px solid var(--border);
+    border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px;
+  }
+  code { font: 14px "JetBrains Mono", ui-monospace, monospace; background: var(--surface-2); padding: 1px 6px; border-radius: 6px; }
+
+  .code {
+    position: relative; background: var(--code-bg); color: var(--code-text); border-radius: 12px; margin: 12px 0;
+  }
+  .code pre {
+    margin: 0; padding: 16px 16px; overflow-x: auto; font: 14px/1.55 "JetBrains Mono", ui-monospace, monospace;
+  }
+  .code pre .c { color: #7d8594; }
+  .code button {
+    position: absolute; top: 8px; right: 8px; border: 1px solid #333944; background: #1f232b; color: #c9ced8;
+    font: 500 12px Inter, sans-serif; padding: 4px 10px; border-radius: 8px; cursor: pointer;
+  }
+  .code button:hover { background: #2a2f39; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+  tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 18px 0; }
+  .node {
+    flex: 1 1 140px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px;
+  }
+  .node b { display: block; font-size: 15px; }
+  .node span { color: var(--muted); font-size: 13px; }
+  .node.hl { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .arrow { align-self: center; color: var(--muted); font-size: 20px; flex: none; }
+  .branch { display: grid; gap: 8px; flex: 1 1 200px; }
+
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin: 8px 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); margin: 8px 0 0; }
+
+  footer { color: var(--muted); font-size: 14px; padding: 48px 0 64px; border-top: 1px solid var(--border); margin-top: 48px; }
+
+  @media (max-width: 560px) {
+    .arrow { transform: rotate(90deg); width: 100%; text-align: center; }
+    .flow { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero wrap">
+  <div class="eyebrow">Xiaomi 4K Laser TV · Ultrakurzdistanz</div>
+  <h1>Schlank, schnell, Ambilight-ready.</h1>
+  <p class="lead">Bloatware runter, Menüs flott, Zwischenbildberechnung richtig eingestellt – und das Apple-TV-Bild landet zusätzlich in Hyperion auf dem Raspberry Pi. Ohne Root, alles umkehrbar.</p>
+</header>
+
+<nav class="toc" aria-label="Inhalt">
+  <ol>
+    <li><a href="#ueberblick">Überblick</a></li>
+    <li><a href="#vorbereitung">1 · Vorbereitung</a></li>
+    <li><a href="#inventur">2 · Inventur</a></li>
+    <li><a href="#entschlacken">3 · Entschlacken</a></li>
+    <li><a href="#performance">4 · Performance</a></li>
+    <li><a href="#memc">5 · Zwischenbild</a></li>
+    <li><a href="#hyperion">6 · Hyperion</a></li>
+    <li><a href="#zurueck">Rückgängig</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+<section id="ueberblick">
+  <h2>Was geht – und was nicht</h2>
+  <p class="sub">Ehrliche Einordnung vorab, damit kein Wochenende verloren geht.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="badge ok">Machbar</span>
+      <h4>Entschlacken &amp; Tempo</h4>
+      <p>Werbung, Telemetrie und unnötige Apps per ADB deaktivieren, Animationen kürzen, Apps neu kompilieren. Umkehrbar, kein Root.</p>
+    </div>
+    <div class="card">
+      <span class="badge warn">Nur mit Hardware</span>
+      <h4>Zwischenbildberechnung</h4>
+      <p>MEMC rechnet ein Chip im Beamer. Software kann es nicht nachrüsten – aber richtig füttern: Apple TV mit passender Bildrate, MEMC-Stufe pro Inhalt.</p>
+    </div>
+    <div class="card">
+      <span class="badge bad">Nicht im Beamer</span>
+      <h4>Bild für Hyperion</h4>
+      <p>HDMI-Bild läuft am Android-System vorbei und ist per HDCP geschützt. Lösung: HDMI-Splitter vor dem Beamer + USB-Grabber am Pi.</p>
+    </div>
+  </div>
+</section>
+
+<section id="vorbereitung">
+  <h2><span class="num">1</span>Vorbereitung</h2>
+  <p class="sub">Einmalig: Debugging am Beamer freischalten und ADB am Rechner installieren.</p>
+
+  <h3>Am Beamer</h3>
+  <ol class="steps">
+    <li><b>Globale Version (Android TV):</b> Einstellungen → Geräteeinstellungen → Info → <i>Build</i> 7× anklicken → zurück → Entwickleroptionen → <b>USB-Debugging</b> bzw. <b>Netzwerk-Debugging</b> an.</li>
+    <li><b>China-Version (PatchWall):</b> Einstellungen → Konto &amp; Sicherheit → <b>ADB-Debugging erlauben</b>.</li>
+    <li>IP-Adresse notieren: Einstellungen → Netzwerk → verbundenes WLAN/LAN.</li>
+    <li>Tipp: Im Router eine feste IP für den Beamer vergeben – dann bleiben alle Befehle gleich.</li>
+  </ol>
+
+  <h3>Am Rechner</h3>
+  <p>ADB gehört zu den <a href="https://developer.android.com/tools/releases/platform-tools" rel="noopener">Android Platform-Tools</a>. Die Skripte sind Bash – läuft auf macOS, Linux und unter Windows in WSL oder Git Bash.</p>
+  <div class="code"><pre><span class="c"># macOS</span>
+brew install android-platform-tools
+<span class="c"># Debian/Ubuntu/Raspberry Pi OS</span>
+sudo apt install adb
+
+<span class="c"># Skripte holen</span>
+git clone https://github.com/mot-dotcom/wilma-waschen.git
+cd wilma-waschen/xiaomi-laser-tv/scripts</pre></div>
+  <p>Beim ersten Verbinden erscheint am Beamer ein Dialog <i>„Debugging zulassen?“</i> – <b>Immer zulassen</b> anhaken und bestätigen.</p>
+</section>
+
+<section id="inventur">
+  <h2><span class="num">2</span>Inventur</h2>
+  <p class="sub">Liest Modell, Chipsatz, Firmware, alle Pakete und MEMC-Hinweise aus. Ändert nichts.</p>
+  <div class="code"><pre>./00-inventory.sh 192.168.178.50</pre></div>
+  <p>Ergebnis liegt unter <code>backup/inventory-…txt</code>. Xiaomi verbaut je nach Modell und Region unterschiedliche Pakete – mit dieser Datei lassen sich die Listen exakt auf deinen Beamer zuschneiden.</p>
+</section>
+
+<section id="entschlacken">
+  <h2><span class="num">3</span>Entschlacken</h2>
+  <p class="sub">Erst Probelauf, dann ausführen. Jede Änderung wird protokolliert.</p>
+
+  <div class="code"><pre><span class="c"># Probelauf: zeigt nur, was deaktiviert würde</span>
+./10-debloat.sh 192.168.178.50
+
+<span class="c"># Ausführen (Standard: Profile safe + xiaomi)</span>
+./10-debloat.sh 192.168.178.50 --apply
+
+<span class="c"># Beamer ist nur noch „Bildschirm“ fürs Apple TV? Dann auch optional:</span>
+./10-debloat.sh 192.168.178.50 --apply optional</pre></div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Profil</th><th>Was weg kommt</th><th>Risiko</th></tr></thead>
+    <tbody>
+      <tr><td><code>safe</code></td><td>Bildschirmschoner, Empfehlungszeilen, Play Spiele/Filme/Music, Feedback, Druckdienst, TalkBack</td><td><span class="badge ok">keins</span></td></tr>
+      <tr><td><code>xiaomi</code></td><td>Werbung, Werbe-SDKs, Telemetrie, Push-Promo, Karaoke, Video-Feed, Game Center, Shop</td><td><span class="badge ok">gering</span></td></tr>
+      <tr><td><code>optional</code></td><td>YouTube, Netflix, Prime, Disney+, Chromecast, Google-Sprachsuche, Galerie</td><td><span class="badge warn">Funktion fehlt danach</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">
+    <strong>Fest geschützt</strong>
+    System-UI, Einstellungen, Google-Play-Dienste, Play Store, HDMI-/TV-Eingänge, Bildverarbeitung, Fernbedienung, Tastatur und der aktive Launcher werden nie angefasst – auch wenn sie versehentlich in einer Liste stehen.
+  </div>
+
+  <p>Technik: <code>pm disable-user --user 0</code>, falls die Firmware das blockt <code>pm uninstall -k --user 0</code>. Beides entfernt nichts aus dem System-Image – ein Werksreset stellt immer alles wieder her.</p>
+
+  <h3>Optional: werbefreier Launcher</h3>
+  <p>Der größte Bremsklotz im Menü ist oft der Startbildschirm selbst (PatchWall bzw. Google TV lädt ständig Empfehlungen). Ein schlanker Launcher wie <b>Projectivy Launcher</b> aus dem Play Store macht das Menü spürbar flotter. Nach der Installation als Standard-Launcher wählen – erst <i>danach</i> kann der alte Launcher in einer eigenen Liste landen.</p>
+</section>
+
+<section id="performance">
+  <h2><span class="num">4</span>Performance</h2>
+  <p class="sub">Animationen halbieren, Hintergrund-Scans aus, CEC an, Caches leeren, Apps neu kompilieren.</p>
+  <div class="code"><pre>./20-performance.sh 192.168.178.50
+adb -s 192.168.178.50:5555 reboot</pre></div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Einstellung</th><th>Wert</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td><code>window/transition/animator scale</code></td><td>0.5</td><td>Menüs reagieren doppelt so schnell</td></tr>
+      <tr><td><code>wifi_/ble_scan_always_enabled</code></td><td>0</td><td>keine Funk-Scans im Hintergrund</td></tr>
+      <tr><td><code>hdmi_control_*</code></td><td>1</td><td>Apple TV schaltet Beamer ein/aus und auf seinen Eingang</td></tr>
+      <tr><td><code>pm trim-caches</code></td><td>–</td><td>App-Caches leeren, Speicher frei</td></tr>
+      <tr><td><code>bg-dexopt-job</code></td><td>–</td><td>alle Apps neu optimiert kompilieren (dauert ein paar Minuten)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Alle Originalwerte landen in <code>backup/settings-…txt</code> und werden von <code>99-restore.sh</code> zurückgeschrieben.</p>
+
+  <h3>Von Hand im Menü</h3>
+  <ol class="steps">
+    <li><b>Automatische App-Updates</b> im Play Store aus – Updates laufen sonst beim Filmstart im Hintergrund.</li>
+    <li><b>Apple TV als Standard-Eingang</b>: Mit CEC schaltet das Apple TV beim Einschalten selbst auf seinen HDMI-Port. Bietet deine Firmware „Eingang beim Einschalten“, dort den Apple-TV-Port wählen.</li>
+    <li><b>HDMI-Modus „Erweitert“ / HDMI 2.0</b> für den Apple-TV-Port aktivieren (falls die Firmware den Punkt hat), sonst gibt es kein 4K60 HDR.</li>
+  </ol>
+</section>
+
+<section id="memc">
+  <h2><span class="num">5</span>Bild &amp; Zwischenbildberechnung</h2>
+  <p class="sub">MEMC funktioniert nur so gut wie das Signal, das ankommt. Darum zuerst das Apple TV.</p>
+
+  <h3>Apple TV: Einstellungen → Video und Audio</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Option</th><th>Einstellung</th><th>Warum</th></tr></thead>
+    <tbody>
+      <tr><td>Format</td><td>4K SDR (60 Hz)</td><td>Menü in SDR, Filme schalten automatisch auf HDR</td></tr>
+      <tr><td>Inhalt anpassen → Dynamikbereich</td><td>Ein</td><td>HDR nur, wenn der Film HDR ist</td></tr>
+      <tr><td>Inhalt anpassen → <b>Bildrate</b></td><td><b>Ein</b></td><td>Filme kommen als echte 24p an, nicht als 60 Hz mit 3:2-Pulldown</td></tr>
+      <tr><td>Chroma</td><td>4:2:2</td><td>volle 4K60 HDR auch über 18-Gbit/s-Splitter</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout">
+    <strong>Der wichtigste Schalter</strong>
+    Ohne „Bildrate anpassen“ wird 24p in 60 Hz gepresst: Bilder werden abwechselnd 3× und 2× gezeigt. Das Ruckeln (Judder) kann MEMC nicht sauber herausrechnen. Mit sauberen 24p wird die Interpolation deutlich ruhiger und artefaktärmer.
+  </div>
+
+  <h3>Beamer: Bild → Erweitert → MEMC / Bewegungskompensation</h3>
+  <p>Der Menüpunkt heißt je nach Firmware MEMC, Motion Compensation, Bewegungsglättung oder 运动补偿.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Inhalt</th><th>Bildmodus</th><th>MEMC</th></tr></thead>
+    <tbody>
+      <tr><td>Filme</td><td>Film / Kino</td><td>Niedrig – flüssiger, ohne Seifenoper-Effekt</td></tr>
+      <tr><td>Serien, Doku</td><td>Film / Standard</td><td>Mittel</td></tr>
+      <tr><td>Sport, Live</td><td>Sport / Standard</td><td>Hoch</td></tr>
+      <tr><td>Spiele</td><td>Spiel</td><td>Aus (Spielmodus schaltet MEMC für geringe Latenz ab)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Versteckte MEMC-Optionen finden</h3>
+  <p>Die Inventur sucht bereits danach. Gezielt nachsehen:</p>
+  <div class="code"><pre>adb -s 192.168.178.50:5555 shell "getprop | grep -iE 'memc|frc|mjc'"
+adb -s 192.168.178.50:5555 shell "settings list global | grep -iE 'memc|motion'"</pre></div>
+
+  <div class="callout warn">
+    <strong>Grenze</strong>
+    Fehlt MEMC im Menü und taucht in der Inventur nichts auf, hat der Chip keine Interpolation – nachrüsten per App ist bei 4K in Echtzeit nicht möglich. Fehlt der Punkt nur zeitweise: im Spielmodus und bei manchen Signalen (z. B. PC/RGB) ist er ausgegraut.
+  </div>
+</section>
+
+<section id="hyperion">
+  <h2><span class="num">6</span>Hyperion: Apple-TV-Bild abgreifen</h2>
+  <p class="sub">Das Signal wird vor dem Beamer geteilt – der Beamer bekommt 4K HDR, der Pi eine kleine Kopie.</p>
+
+  <h3>Warum nicht direkt im Beamer?</h3>
+  <ul>
+    <li>Das HDMI-Bild läuft über einen eigenen Hardware-Videopfad am Android-System vorbei. Bildschirmaufnahme-Apps (z. B. <i>Hyperion Grabber</i>) sehen dort nur Schwarz.</li>
+    <li>Apple TV schickt Filme mit HDCP 2.2. Android liefert geschützte Inhalte an Aufnahme-Apps grundsätzlich schwarz aus.</li>
+    <li>Ohne Root kommt man an die internen Videogeräte nicht heran – und auch mit Root greift der Kopierschutz.</li>
+  </ul>
+  <p>Für Apps <i>auf dem Beamer selbst</i> (ohne DRM, z. B. YouTube) funktioniert die Android-App <i>Hyperion Grabber</i> trotzdem – für das Apple TV nicht.</p>
+
+  <h3>Aufbau</h3>
+  <div class="flow" role="img" aria-label="Apple TV zu HDMI-Splitter; Ausgang 1 zum Beamer, Ausgang 2 über USB-Grabber zum Raspberry Pi mit Hyperion, der die LEDs steuert">
+    <div class="node"><b>Apple TV 4K</b><span>4K HDR · 24p</span></div>
+    <div class="arrow">→</div>
+    <div class="node hl"><b>HDMI-Splitter 1×2</b><span>18 Gbit/s · Scaler · EDID von OUT1</span></div>
+    <div class="arrow">→</div>
+    <div class="branch">
+      <div class="node"><b>OUT 1 → Laser TV</b><span>4K60 HDR, unverändert</span></div>
+      <div class="node"><b>OUT 2 → USB-Grabber</b><span>1080p/720p → Raspberry Pi → LEDs</span></div>
+    </div>
+  </div>
+
+  <h3>Einkaufsliste</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Teil</th><th>Worauf achten</th></tr></thead>
+    <tbody>
+      <tr><td>HDMI-Splitter 1×2</td><td>HDMI 2.0, 18 Gbit/s, 4K60 HDR10 durchgereicht; <b>Downscaling</b> am zweiten Ausgang; <b>EDID-Schalter</b> („Copy OUT1“), damit das Apple TV die Fähigkeiten des Beamers sieht</td></tr>
+      <tr><td>USB-Grabber</td><td>Chip <b>MS2130</b> (USB 3, 1080p60 YUYV) – erste Wahl. MS2109 (USB 2, 1080p30 MJPEG) geht auch, ist aber langsamer und etwas blasser</td></tr>
+      <tr><td>Raspberry Pi</td><td>Pi 4 oder 5, Grabber an einen <b>blauen USB-3-Port</b></td></tr>
+      <tr><td>Kabel</td><td>Zertifizierte „Premium High Speed“ HDMI-Kabel, kurz halten</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout warn">
+    <strong>HDCP</strong>
+    Der Grabber bekommt nur dann ein Bild, wenn der Splitter am zweiten Ausgang kein HDCP 2.2 verlangt. Viele Splitter mit Scaler tun das. Rechtlich ist das Umgehen eines Kopierschutzes in Deutschland (§ 95a UrhG) heikel – auch wenn das Bild hier nur in Farbdurchschnitte für LEDs zerlegt wird. Bitte selbst prüfen.
+  </div>
+
+  <h3>Software am Pi: HyperHDR statt Hyperion.ng</h3>
+  <p><b>HyperHDR</b> ist ein Fork von Hyperion.ng, optimiert für genau diesen Aufbau: schnellere USB-Grabber-Verarbeitung und <b>HDR-Tone-Mapping</b>. Ohne Tone-Mapping leuchten die LEDs bei HDR-Filmen blass und entsättigt. Bestehende LED-Konfiguration lässt sich übernehmen.</p>
+  <ol class="steps">
+    <li>Grabber anstecken und prüfen:
+      <div class="code"><pre>sudo apt install v4l-utils ffmpeg
+./pi-capture-check.sh</pre></div>
+    </li>
+    <li>Weboberfläche öffnen (<code>http://&lt;pi&gt;:8090</code>) → Erweiterter Modus an.</li>
+    <li><b>Video-Grabber</b>: USB-Gerät wählen, 1280×720 oder 1920×1080, Format YUYV (MS2130) bzw. MJPEG (MS2109), 30–60 fps. Mehr Auflösung bringt für LEDs nichts.</li>
+    <li><b>Signal-Erkennung</b> an – LEDs gehen aus, wenn das Apple TV schläft.</li>
+    <li><b>HDR-Tone-Mapping</b> an (nur HyperHDR). Bleiben die LEDs bei Dolby-Vision-Filmen lila/grün: Splitter-EDID auf ein Profil ohne Dolby Vision stellen, HDR10 bleibt erhalten.</li>
+    <li><b>Ränder abschneiden</b> (Crop) für schwarze Balken bei Cinemascope, oder automatische Balkenerkennung aktivieren.</li>
+  </ol>
+
+  <h3>LEDs mit dem Bild synchronisieren</h3>
+  <p>MEMC und Bildverarbeitung im Beamer kosten Zeit. Der Pi bekommt das Bild <i>vor</i> dieser Verarbeitung – die LEDs laufen dem Bild also voraus. Ausgleich in der Weboberfläche unter <b>Glättung (Smoothing) → Verzögerung</b>: mit einem Testvideo mit harten Schwarz/Weiß-Wechseln so lange erhöhen, bis Bild und LEDs gleichzeitig umschalten. Mit MEMC „Hoch“ ist die nötige Verzögerung größer als mit „Aus“.</p>
+</section>
+
+<section id="zurueck">
+  <h2>Rückgängig machen</h2>
+  <p class="sub">Alles, was die Skripte geändert haben, kommt mit einem Befehl zurück.</p>
+  <div class="code"><pre><span class="c"># alles zurück</span>
+./99-restore.sh 192.168.178.50
+
+<span class="c"># nur eine App zurück, z. B. Netflix</span>
+./99-restore.sh 192.168.178.50 com.netflix.ninja</pre></div>
+  <p>Notfall: Ein Werksreset (Einstellungen → Geräteeinstellungen → Zurücksetzen) stellt jede deaktivierte App wieder her, da nichts aus dem System-Image gelöscht wird.</p>
+</section>
+
+<section id="faq">
+  <h2>FAQ</h2>
+  <details>
+    <summary>„adb: unauthorized“ oder keine Verbindung</summary>
+    <p>Dialog am Beamer bestätigen. Kam keiner: Debugging aus- und wieder einschalten, <code>adb kill-server</code>, erneut verbinden. Netzwerk-Debugging muss nach Firmware-Updates manchmal neu aktiviert werden.</p>
+  </details>
+  <details>
+    <summary>Ein Firmware-Update hat Apps zurückgebracht</summary>
+    <p>Normal – Updates aktivieren Systempakete teils neu. Einfach <code>10-debloat.sh --apply</code> erneut laufen lassen.</p>
+  </details>
+  <details>
+    <summary>Nach dem Splitter kein 4K HDR mehr am Beamer</summary>
+    <p>EDID-Schalter des Splitters auf „Copy OUT1“ bzw. den 4K-HDR-Modus stellen, Apple TV neu starten und unter Video und Audio „HDMI-Verbindung prüfen“ laufen lassen.</p>
+  </details>
+  <details>
+    <summary>Der Grabber liefert nur ein schwarzes Bild</summary>
+    <p>Fast immer HDCP: Der zweite Splitter-Ausgang verlangt HDCP 2.2, der Grabber kann es nicht. Test: Apple-TV-Menü (ohne Film) – kommt das Menü an, Filme aber nicht, ist es HDCP.</p>
+  </details>
+  <details>
+    <summary>LEDs blass bei HDR-Filmen</summary>
+    <p>HDR-Signal ohne Tone-Mapping. In HyperHDR Tone-Mapping aktivieren. Unter Hyperion.ng gibt es dafür keine gleichwertige Lösung.</p>
+  </details>
+</section>
+
+</main>
+
+<footer class="wrap">
+  Alle Änderungen ohne Root und umkehrbar. Paketnamen variieren je nach Modell und Region – zuerst die Inventur laufen lassen. Skripte und Paketlisten im Repository unter <code>xiaomi-laser-tv/</code>.
+</footer>
+
+<script>
+  document.querySelectorAll('.code').forEach(block => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Kopieren';
+    btn.addEventListener('click', async () => {
+      const text = [...block.querySelector('pre').childNodes]
+        .filter(n => !(n.nodeType === 1 && n.classList.contains('c')))
+        .map(n => n.textContent).join('')
+        .split('\n').filter(l => l.trim()).join('\n');
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = 'Kopiert';
+      } catch {
+        btn.textContent = 'Fehler';
+      }
+      setTimeout(() => (btn.textContent = 'Kopieren'), 1500);
+    });
+    block.appendChild(btn);
+  });
+</script>
+</body>
+</html>

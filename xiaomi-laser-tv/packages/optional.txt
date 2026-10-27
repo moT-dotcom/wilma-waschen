@@ -1,0 +1,11 @@
+# Profil "optional" – nur wählen, wenn du die Funktion wirklich nicht nutzt.
+# Typisch: Alles läuft über Apple TV, der Beamer ist nur noch "Bildschirm".
+com.google.android.youtube.tv                # YouTube
+com.netflix.ninja                            # Netflix
+com.amazon.amazonvideo.livingroom            # Prime Video
+com.disney.disneyplus                        # Disney+
+com.google.android.apps.mediashell           # Chromecast built-in (kein Casten mehr!)
+com.google.android.katniss                   # Google-Sprachsuche (Mikrofon-Taste tot!)
+com.google.android.speech.pumpkin            # Offline-Sprachbefehle
+com.google.android.tvrecommendations         # Empfehlungsdienst für den Launcher
+com.android.gallery3d                        # Galerie

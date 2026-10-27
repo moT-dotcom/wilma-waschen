@@ -1,0 +1,14 @@
+# Profil "safe" – Google-/Android-TV-Ballast ohne Systemfunktion.
+# Nichts davon wird gebraucht, wenn das Bild vom Apple TV kommt.
+# Format: paketname   # kommentar
+com.google.android.backdrop                  # Ambient-Modus / Fotos-Bildschirmschoner
+com.android.dreams.basic                     # Standard-Bildschirmschoner
+com.android.dreams.phototable                # Foto-Bildschirmschoner
+com.google.android.leanbacklauncher.recommendations  # Empfehlungszeilen im Startbildschirm
+com.google.android.play.games                # Play Spiele
+com.google.android.videos                    # Play Filme & Serien
+com.google.android.music                     # Play Music (eingestellt)
+com.google.android.youtube.tvmusic           # YouTube Music
+com.google.android.feedback                  # Feedback-Dialoge
+com.android.printspooler                     # Druckdienst (auf einem Beamer?)
+com.google.android.marvin.talkback           # Bildschirmleser (Bedienungshilfe)
