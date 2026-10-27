@@ -369,7 +369,9 @@ adb -s 192.168.178.50:5555 shell "settings list global | grep -iE 'memc|motion'"
     <li>Apple TV schickt Filme mit HDCP 2.2. Android liefert geschützte Inhalte an Aufnahme-Apps grundsätzlich schwarz aus.</li>
     <li>Ohne Root kommt man an die internen Videogeräte nicht heran – und auch mit Root greift der Kopierschutz.</li>
   </ul>
-  <p>Für Apps <i>auf dem Beamer selbst</i> (ohne DRM, z. B. YouTube) funktioniert die Android-App <i>Hyperion Grabber</i> trotzdem – für das Apple TV nicht.</p>
+  <p>Für Apps <i>auf dem Beamer selbst</i> (ohne DRM, z. B. YouTube) funktioniert die Android-App <i>Hyperion Grabber</i> trotzdem – für das Apple TV nicht. Installation per Skript:</p>
+  <div class="code"><pre>./30-install-grabber.sh 192.168.178.50</pre></div>
+  <p>In der App die IP des Pi und Port 19445 eintragen (Protobuf-Server in Hyperion/HyperHDR aktivieren).</p>
 
   <h3>Aufbau</h3>
   <div class="flow" role="img" aria-label="Apple TV zu HDMI-Splitter; Ausgang 1 zum Beamer, Ausgang 2 über USB-Grabber zum Raspberry Pi mit Hyperion, der die LEDs steuert">

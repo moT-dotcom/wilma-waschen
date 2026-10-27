@@ -32,6 +32,7 @@ Am Raspberry Pi:
 | `scripts/00-inventory.sh` | Inventur, schreibt `backup/inventory-*.txt` |
 | `scripts/10-debloat.sh` | deaktiviert Pakete nach Profil, protokolliert in `backup/changes-*.log` |
 | `scripts/20-performance.sh` | Settings-Tweaks, sichert Originalwerte in `backup/settings-*.txt` |
+| `scripts/30-install-grabber.sh` | installiert Hyperion Grabber (nur Apps auf dem Beamer, nicht HDMI) |
 | `scripts/99-restore.sh` | macht beides rückgängig, auch einzeln pro Paket |
 | `packages/*.txt` | Profile `safe`, `xiaomi`, `optional` |
 | `hyperion/pi-capture-check.sh` | Prüfskript für den Pi |
