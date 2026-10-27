@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Xiaomi Laser TV optimieren</title>
-<meta name="description" content="Xiaomi 4K Laser TV entschlacken, schneller machen, Zwischenbildberechnung richtig nutzen und das Apple-TV-Bild für Hyperion auf dem Raspberry Pi abgreifen.">
+<meta name="description" content="Xiaomi 4K Laser TV entschlacken, schneller machen, Zwischenbildberechnung richtig nutzen und das Apple-TV-Bild optimal darstellen.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -158,34 +158,20 @@
   tr:last-child td { border-bottom: 0; }
   td code { white-space: nowrap; }
 
-  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 18px 0; }
-  .node {
-    flex: 1 1 140px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px;
-  }
-  .node b { display: block; font-size: 15px; }
-  .node span { color: var(--muted); font-size: 13px; }
-  .node.hl { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .arrow { align-self: center; color: var(--muted); font-size: 20px; flex: none; }
-  .branch { display: grid; gap: 8px; flex: 1 1 200px; }
 
   details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin: 8px 0; }
   summary { cursor: pointer; font-weight: 600; }
   details p { color: var(--muted); margin: 8px 0 0; }
 
   footer { color: var(--muted); font-size: 14px; padding: 48px 0 64px; border-top: 1px solid var(--border); margin-top: 48px; }
-
-  @media (max-width: 560px) {
-    .arrow { transform: rotate(90deg); width: 100%; text-align: center; }
-    .flow { flex-direction: column; }
-  }
 </style>
 </head>
 <body>
 
 <header class="hero wrap">
   <div class="eyebrow">Xiaomi 4K Laser TV · Ultrakurzdistanz</div>
-  <h1>Schlank, schnell, Ambilight-ready.</h1>
-  <p class="lead">Bloatware runter, Menüs flott, Zwischenbildberechnung richtig eingestellt – und das Apple-TV-Bild landet zusätzlich in Hyperion auf dem Raspberry Pi. Ohne Root, alles umkehrbar.</p>
+  <h1>Schlank, schnell, kinoreif.</h1>
+  <p class="lead">Bloatware runter, Menüs flott, Zwischenbildberechnung richtig eingestellt – damit das Apple-TV-Bild so gut aussieht, wie der Beamer kann. Ohne Root, alles umkehrbar.</p>
 </header>
 
 <nav class="toc" aria-label="Inhalt">
@@ -196,7 +182,6 @@
     <li><a href="#entschlacken">3 · Entschlacken</a></li>
     <li><a href="#performance">4 · Performance</a></li>
     <li><a href="#memc">5 · Zwischenbild</a></li>
-    <li><a href="#hyperion">6 · Hyperion</a></li>
     <li><a href="#zurueck">Rückgängig</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ol>
@@ -217,11 +202,6 @@
       <span class="badge warn">Nur mit Hardware</span>
       <h4>Zwischenbildberechnung</h4>
       <p>MEMC rechnet ein Chip im Beamer. Software kann es nicht nachrüsten – aber richtig füttern: Apple TV mit passender Bildrate, MEMC-Stufe pro Inhalt.</p>
-    </div>
-    <div class="card">
-      <span class="badge bad">Nicht im Beamer</span>
-      <h4>Bild für Hyperion</h4>
-      <p>HDMI-Bild läuft am Android-System vorbei und ist per HDCP geschützt. Lösung: HDMI-Splitter vor dem Beamer + USB-Grabber am Pi.</p>
     </div>
   </div>
 </section>
@@ -328,7 +308,7 @@ adb -s 192.168.178.50:5555 reboot</pre></div>
       <tr><td>Format</td><td>4K SDR (60 Hz)</td><td>Menü in SDR, Filme schalten automatisch auf HDR</td></tr>
       <tr><td>Inhalt anpassen → Dynamikbereich</td><td>Ein</td><td>HDR nur, wenn der Film HDR ist</td></tr>
       <tr><td>Inhalt anpassen → <b>Bildrate</b></td><td><b>Ein</b></td><td>Filme kommen als echte 24p an, nicht als 60 Hz mit 3:2-Pulldown</td></tr>
-      <tr><td>Chroma</td><td>4:2:2</td><td>volle 4K60 HDR auch über 18-Gbit/s-Splitter</td></tr>
+      <tr><td>Chroma</td><td>4:2:2</td><td>volle 4K60 HDR innerhalb der HDMI-2.0-Bandbreite</td></tr>
     </tbody>
   </table></div>
   <div class="callout">
@@ -359,68 +339,6 @@ adb -s 192.168.178.50:5555 shell "settings list global | grep -iE 'memc|motion'"
   </div>
 </section>
 
-<section id="hyperion">
-  <h2><span class="num">6</span>Hyperion: Apple-TV-Bild abgreifen</h2>
-  <p class="sub">Das Signal wird vor dem Beamer geteilt – der Beamer bekommt 4K HDR, der Pi eine kleine Kopie.</p>
-
-  <h3>Warum nicht direkt im Beamer?</h3>
-  <ul>
-    <li>Das HDMI-Bild läuft über einen eigenen Hardware-Videopfad am Android-System vorbei. Bildschirmaufnahme-Apps (z. B. <i>Hyperion Grabber</i>) sehen dort nur Schwarz.</li>
-    <li>Apple TV schickt Filme mit HDCP 2.2. Android liefert geschützte Inhalte an Aufnahme-Apps grundsätzlich schwarz aus.</li>
-    <li>Ohne Root kommt man an die internen Videogeräte nicht heran – und auch mit Root greift der Kopierschutz.</li>
-  </ul>
-  <p>Für Apps <i>auf dem Beamer selbst</i> (ohne DRM, z. B. YouTube) funktioniert die Android-App <i>Hyperion Grabber</i> trotzdem – für das Apple TV nicht. Installation per Skript:</p>
-  <div class="code"><pre>./30-install-grabber.sh 192.168.178.50</pre></div>
-  <p>In der App die IP des Pi und Port 19445 eintragen (Protobuf-Server in Hyperion/HyperHDR aktivieren).</p>
-
-  <h3>Aufbau</h3>
-  <div class="flow" role="img" aria-label="Apple TV zu HDMI-Splitter; Ausgang 1 zum Beamer, Ausgang 2 über USB-Grabber zum Raspberry Pi mit Hyperion, der die LEDs steuert">
-    <div class="node"><b>Apple TV 4K</b><span>4K HDR · 24p</span></div>
-    <div class="arrow">→</div>
-    <div class="node hl"><b>HDMI-Splitter 1×2</b><span>18 Gbit/s · Scaler · EDID von OUT1</span></div>
-    <div class="arrow">→</div>
-    <div class="branch">
-      <div class="node"><b>OUT 1 → Laser TV</b><span>4K60 HDR, unverändert</span></div>
-      <div class="node"><b>OUT 2 → USB-Grabber</b><span>1080p/720p → Raspberry Pi → LEDs</span></div>
-    </div>
-  </div>
-
-  <h3>Einkaufsliste</h3>
-  <div class="table-wrap"><table>
-    <thead><tr><th>Teil</th><th>Worauf achten</th></tr></thead>
-    <tbody>
-      <tr><td>HDMI-Splitter 1×2<br><b>Premium:</b> HDFury Diva</td><td>Reicht 4K HDR unverändert zum Beamer durch. Der Downscale-Ausgang liefert 1080p <b>SDR</b> mit HDCP 1.4 – der Grabber bekommt korrekte Farben, ganz ohne Tone-Mapping. Mehrere hundert Euro.</td></tr>
-      <tr><td><b>Preiswert:</b> EZCOO EZ-SP12H2</td><td>HDMI 2.0, 4K60 HDR/Dolby Vision an OUT1, EDID „Copy OUT1“, Scaler 4K→1080p an OUT2. OUT2 bleibt bei HDR-Filmen HDR (8 bit) → in HyperHDR Tone-Mapping mit LUT nötig. HDCP am Grabber-Ausgang vor dem Kauf prüfen (Rückgaberecht).</td></tr>
-      <tr><td>Grundregel</td><td>Nur Splitter mit <b>EDID-Schalter</b>. Ohne ihn handelt das Apple TV das schwächste Gerät aus – den Grabber – und schickt auch dem Beamer nur 1080p SDR.</td></tr>
-      <tr><td>USB-Grabber</td><td>Chip <b>MS2130</b> (USB 3, 1080p60 YUYV), z. B. UGREEN 25173 – erste Wahl. Achtung Firmware: Für neuere MS2130-Firmware passen die fertigen HyperHDR-LUTs nicht, dann einmal selbst kalibrieren. MS2109 (USB 2) geht auch, ist aber langsamer und blasser</td></tr>
-      <tr><td>Raspberry Pi</td><td>Pi 4 oder 5, Grabber an einen <b>blauen USB-3-Port</b></td></tr>
-      <tr><td>Kabel</td><td>Zertifizierte „Premium High Speed“ HDMI-Kabel, kurz halten</td></tr>
-    </tbody>
-  </table></div>
-
-  <div class="callout warn">
-    <strong>HDCP</strong>
-    Der Grabber bekommt nur dann ein Bild, wenn der Splitter am zweiten Ausgang kein HDCP 2.2 verlangt. Viele Splitter mit Scaler tun das. Rechtlich ist das Umgehen eines Kopierschutzes in Deutschland (§ 95a UrhG) heikel – auch wenn das Bild hier nur in Farbdurchschnitte für LEDs zerlegt wird. Bitte selbst prüfen.
-  </div>
-
-  <h3>Software am Pi: HyperHDR statt Hyperion.ng</h3>
-  <p><b>HyperHDR</b> ist ein Fork von Hyperion.ng, optimiert für genau diesen Aufbau: schnellere USB-Grabber-Verarbeitung und <b>HDR-Tone-Mapping</b>. Ohne Tone-Mapping leuchten die LEDs bei HDR-Filmen blass und entsättigt. Bestehende LED-Konfiguration lässt sich übernehmen.</p>
-  <ol class="steps">
-    <li>Grabber anstecken und prüfen:
-      <div class="code"><pre>sudo apt install v4l-utils ffmpeg
-./pi-capture-check.sh</pre></div>
-    </li>
-    <li>Weboberfläche öffnen (<code>http://&lt;pi&gt;:8090</code>) → Erweiterter Modus an.</li>
-    <li><b>Video-Grabber</b>: USB-Gerät wählen, 1280×720 oder 1920×1080, Format YUYV (MS2130) bzw. MJPEG (MS2109), 30–60 fps. Mehr Auflösung bringt für LEDs nichts.</li>
-    <li><b>Signal-Erkennung</b> an – LEDs gehen aus, wenn das Apple TV schläft.</li>
-    <li><b>HDR-Tone-Mapping</b> an (nur HyperHDR). Bleiben die LEDs bei Dolby-Vision-Filmen lila/grün: Splitter-EDID auf ein Profil ohne Dolby Vision stellen, HDR10 bleibt erhalten.</li>
-    <li><b>Ränder abschneiden</b> (Crop) für schwarze Balken bei Cinemascope, oder automatische Balkenerkennung aktivieren.</li>
-  </ol>
-
-  <h3>LEDs mit dem Bild synchronisieren</h3>
-  <p>MEMC und Bildverarbeitung im Beamer kosten Zeit. Der Pi bekommt das Bild <i>vor</i> dieser Verarbeitung – die LEDs laufen dem Bild also voraus. Ausgleich in der Weboberfläche unter <b>Glättung (Smoothing) → Verzögerung</b>: mit einem Testvideo mit harten Schwarz/Weiß-Wechseln so lange erhöhen, bis Bild und LEDs gleichzeitig umschalten. Mit MEMC „Hoch“ ist die nötige Verzögerung größer als mit „Aus“.</p>
-</section>
-
 <section id="zurueck">
   <h2>Rückgängig machen</h2>
   <p class="sub">Alles, was die Skripte geändert haben, kommt mit einem Befehl zurück.</p>
@@ -441,18 +359,6 @@ adb -s 192.168.178.50:5555 shell "settings list global | grep -iE 'memc|motion'"
   <details>
     <summary>Ein Firmware-Update hat Apps zurückgebracht</summary>
     <p>Normal – Updates aktivieren Systempakete teils neu. Einfach <code>10-debloat.sh --apply</code> erneut laufen lassen.</p>
-  </details>
-  <details>
-    <summary>Nach dem Splitter kein 4K HDR mehr am Beamer</summary>
-    <p>EDID-Schalter des Splitters auf „Copy OUT1“ bzw. den 4K-HDR-Modus stellen, Apple TV neu starten und unter Video und Audio „HDMI-Verbindung prüfen“ laufen lassen.</p>
-  </details>
-  <details>
-    <summary>Der Grabber liefert nur ein schwarzes Bild</summary>
-    <p>Fast immer HDCP: Der zweite Splitter-Ausgang verlangt HDCP 2.2, der Grabber kann es nicht. Test: Apple-TV-Menü (ohne Film) – kommt das Menü an, Filme aber nicht, ist es HDCP.</p>
-  </details>
-  <details>
-    <summary>LEDs blass bei HDR-Filmen</summary>
-    <p>HDR-Signal ohne Tone-Mapping. In HyperHDR Tone-Mapping aktivieren. Unter Hyperion.ng gibt es dafür keine gleichwertige Lösung.</p>
   </details>
 </section>
 
