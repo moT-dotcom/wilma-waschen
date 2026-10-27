@@ -389,8 +389,10 @@ adb -s 192.168.178.50:5555 shell "settings list global | grep -iE 'memc|motion'"
   <div class="table-wrap"><table>
     <thead><tr><th>Teil</th><th>Worauf achten</th></tr></thead>
     <tbody>
-      <tr><td>HDMI-Splitter 1×2</td><td>HDMI 2.0, 18 Gbit/s, 4K60 HDR10 durchgereicht; <b>Downscaling</b> am zweiten Ausgang; <b>EDID-Schalter</b> („Copy OUT1“), damit das Apple TV die Fähigkeiten des Beamers sieht</td></tr>
-      <tr><td>USB-Grabber</td><td>Chip <b>MS2130</b> (USB 3, 1080p60 YUYV) – erste Wahl. MS2109 (USB 2, 1080p30 MJPEG) geht auch, ist aber langsamer und etwas blasser</td></tr>
+      <tr><td>HDMI-Splitter 1×2<br><b>Premium:</b> HDFury Diva</td><td>Reicht 4K HDR unverändert zum Beamer durch. Der Downscale-Ausgang liefert 1080p <b>SDR</b> mit HDCP 1.4 – der Grabber bekommt korrekte Farben, ganz ohne Tone-Mapping. Mehrere hundert Euro.</td></tr>
+      <tr><td><b>Preiswert:</b> EZCOO EZ-SP12H2</td><td>HDMI 2.0, 4K60 HDR/Dolby Vision an OUT1, EDID „Copy OUT1“, Scaler 4K→1080p an OUT2. OUT2 bleibt bei HDR-Filmen HDR (8 bit) → in HyperHDR Tone-Mapping mit LUT nötig. HDCP am Grabber-Ausgang vor dem Kauf prüfen (Rückgaberecht).</td></tr>
+      <tr><td>Grundregel</td><td>Nur Splitter mit <b>EDID-Schalter</b>. Ohne ihn handelt das Apple TV das schwächste Gerät aus – den Grabber – und schickt auch dem Beamer nur 1080p SDR.</td></tr>
+      <tr><td>USB-Grabber</td><td>Chip <b>MS2130</b> (USB 3, 1080p60 YUYV), z. B. UGREEN 25173 – erste Wahl. Achtung Firmware: Für neuere MS2130-Firmware passen die fertigen HyperHDR-LUTs nicht, dann einmal selbst kalibrieren. MS2109 (USB 2) geht auch, ist aber langsamer und blasser</td></tr>
       <tr><td>Raspberry Pi</td><td>Pi 4 oder 5, Grabber an einen <b>blauen USB-3-Port</b></td></tr>
       <tr><td>Kabel</td><td>Zertifizierte „Premium High Speed“ HDMI-Kabel, kurz halten</td></tr>
     </tbody>
