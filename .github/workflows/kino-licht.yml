@@ -1,0 +1,56 @@
+name: Kino-Licht APK
+
+on:
+  push:
+    paths:
+      - "xiaomi-laser-tv/kino-licht/**"
+      - ".github/workflows/kino-licht.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kino-licht-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: xiaomi-laser-tv/kino-licht
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Kernlogik testen
+        run: ./gradlew -p core test --console=plain
+
+      - name: APK bauen
+        run: ./gradlew :app:assembleRelease --console=plain
+
+      - name: APK bereitstellen
+        run: cp app/build/outputs/apk/release/app-release.apk kino-licht.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kino-licht-apk
+          path: xiaomi-laser-tv/kino-licht/kino-licht.apk
+
+      - name: Als Release „kino-licht“ veröffentlichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete kino-licht --yes --cleanup-tag || true
+          gh release create kino-licht kino-licht.apk \
+            --title "Kino-Licht (neueste Version)" \
+            --notes "Automatisch gebaut aus ${GITHUB_SHA::7} (Branch ${GITHUB_REF_NAME}). Installation: xiaomi-laser-tv/scripts/40-install-kino-licht.sh" \
+            --prerelease \
+            --target "$GITHUB_SHA"
