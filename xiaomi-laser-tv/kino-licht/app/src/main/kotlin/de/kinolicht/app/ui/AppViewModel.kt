@@ -73,8 +73,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private var visible = true
 
     // Live-Vorschau: StateFlows verwerfen Zwischenwerte, wenn Hyperion langsamer ist als das Steuerkreuz.
-    private val liveAction = MutableStateFlow<LightAction?>(null)
-    private val liveBrightness = MutableStateFlow<Int?>(null)
+    // Die Sequenznummer sorgt dafür, dass auch ein erneut gewählter gleicher Wert gesendet wird.
+    private data class Live<T>(val value: T, val seq: Long)
+    private var liveSeq = 0L
+    private val liveAction = MutableStateFlow<Live<LightAction>?>(null)
+    private val liveBrightness = MutableStateFlow<Live<Int>?>(null)
     private var rememberJob: Job? = null
 
     init {
@@ -91,7 +94,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         viewModelScope.launch(Dispatchers.IO) {
-            liveAction.filterNotNull().collect { action ->
+            liveAction.filterNotNull().collect { (action, _) ->
                 runLight(quiet = true) { c ->
                     if (_state.value?.ledsOn == false) turnOn()
                     when (action) {
@@ -107,7 +110,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         viewModelScope.launch(Dispatchers.IO) {
-            liveBrightness.filterNotNull().collect { value ->
+            liveBrightness.filterNotNull().collect { (value, _) ->
                 runLight(quiet = true) { c -> c.setBrightness(value) }
             }
         }
@@ -131,7 +134,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Farbe oder Verlauf sofort zeigen (für Paletten, Regler, Verlaufseditor). */
     fun preview(action: LightAction, label: String = "Zuletzt gewählt") {
-        liveAction.value = action
+        liveAction.value = Live(action, ++liveSeq)
         if (action is LightAction.Solid) workColor.value = action.color
         rememberJob?.cancel()
         rememberJob = viewModelScope.launch {
@@ -141,7 +144,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setBrightness(value: Int) {
-        liveBrightness.value = value
+        liveBrightness.value = Live(value, ++liveSeq)
         _state.value = _state.value?.copy(brightness = value)
         store.update { it.copy(userBrightness = value) }
     }
