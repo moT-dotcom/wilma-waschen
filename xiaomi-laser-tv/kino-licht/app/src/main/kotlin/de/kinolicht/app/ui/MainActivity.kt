@@ -164,7 +164,9 @@ private fun StatusBar(vm: AppViewModel) {
         Box(Modifier.size(12.dp).clip(CircleShape).background(dot))
         Spacer(Modifier.width(10.dp))
         Text(text, color = KL.muted, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        val badge = task ?: sleepEndsAt?.let { "😴 noch ${((it - now) / 60_000).coerceAtLeast(0) + 1} min" }
+        // Beim Einschlaf-Timer zählen die Restminuten, erst beim Ausblenden der Fortschritt.
+        val fading = task?.endsWith("%") == true
+        val badge = if (fading) task else sleepEndsAt?.let { "😴 noch ${((it - now) / 60_000).coerceAtLeast(0) + 1} min" } ?: task
         if (badge != null) {
             Text(
                 badge,
