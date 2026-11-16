@@ -27,6 +27,7 @@ cd scripts
 | `scripts/20-performance.sh` | Settings-Tweaks, sichert Originalwerte in `backup/settings-*.txt` |
 | `scripts/40-install-kino-licht.sh` | installiert die Kino-Licht-App (LED-Steuerung für Hyperion) |
 | `scripts/50-capture-probe.sh` | prüft, ob der Beamer das laufende (HDMI-)Bild an Aufnahmen herausgibt |
+| `scripts/60-root-check.sh` | prüft gefahrlos, ob sich der Beamer rooten lässt (ändert nichts) |
 | `scripts/99-restore.sh` | macht beides rückgängig, auch einzeln pro Paket |
 | `packages/*.txt` | Profile `safe`, `xiaomi`, `optional` |
 | `kino-licht/` | Android-TV-App zur Steuerung von Hyperion.ng ([README](kino-licht/README.md)) |
