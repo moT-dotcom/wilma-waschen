@@ -53,6 +53,7 @@ enum class Tab(val label: String, val icon: String) {
     COLORS("Farben", "🎨"),
     EFFECTS("Effekte", "✨"),
     SCENES("Szenen", "🎬"),
+    SYNC("Bild-Sync", "📺"),
     SCHEDULE("Zeitplan", "⏰"),
     AUTOMATION("Automatik", "🤖"),
     SETTINGS("Verbindung", "🔌"),
@@ -76,6 +77,7 @@ fun MainScreen(vm: AppViewModel) {
                         Tab.EFFECTS -> EffectsScreen(vm)
                         Tab.SCENES -> ScenesScreen(vm)
                         Tab.SCHEDULE -> ScheduleScreen(vm)
+                        Tab.SYNC -> SyncScreen(vm)
                         Tab.AUTOMATION -> AutomationScreen(vm)
                         Tab.SETTINGS -> SettingsScreen(vm)
                     }
@@ -94,10 +96,10 @@ private fun NavRail(selected: Tab, onSelect: (Tab) -> Unit) {
             .width(240.dp)
             .fillMaxHeight()
             .background(Color(0xFF0E0F14))
-            .padding(horizontal = 18.dp, vertical = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(horizontal = 18.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 8.dp, bottom = 22.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 8.dp, bottom = 14.dp)) {
             Box(
                 Modifier.size(14.dp).clip(CircleShape).background(KL.accent),
             )
@@ -108,7 +110,7 @@ private fun NavRail(selected: Tab, onSelect: (Tab) -> Unit) {
             FocusBox(
                 onClick = { onSelect(t) },
                 onFocus = { onSelect(t) },
-                modifier = Modifier.fillMaxWidth().height(54.dp),
+                modifier = Modifier.fillMaxWidth().height(48.dp),
                 selected = t == selected,
                 background = Color.Transparent,
                 focusScale = 1.03f,

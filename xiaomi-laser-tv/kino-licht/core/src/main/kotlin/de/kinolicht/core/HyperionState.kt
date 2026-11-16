@@ -37,6 +37,7 @@ data class HyperionState(
     fun describeSource(ownPriority: Int): String {
         if (!ledsOn) return "LEDs aus"
         val p = visiblePriority ?: return "Keine aktive Quelle"
+        if (p.priority == Frame.syncPriority(ownPriority) && p.componentId == "IMAGE") return "Bild-Sync · Kino-Licht"
         val who = if (p.priority == ownPriority) "Kino-Licht" else p.origin?.substringBefore('@')?.ifBlank { null } ?: p.componentId
         val what = when (p.componentId) {
             "COLOR" -> "Farbe ${p.color?.hex ?: ""}".trim()

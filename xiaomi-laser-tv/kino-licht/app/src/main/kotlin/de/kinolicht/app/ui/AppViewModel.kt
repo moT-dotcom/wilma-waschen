@@ -1,6 +1,8 @@
 package de.kinolicht.app.ui
 
 import android.app.Application
+import android.graphics.Bitmap
+import de.kinolicht.app.CaptureStatus
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.kinolicht.app.HyperionDiscovery
@@ -50,6 +52,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val config: StateFlow<AppConfig> = store.config
     val sleepEndsAt: StateFlow<Long?> = LightRuntime.sleepEndsAt
     val task: StateFlow<String?> = LightRuntime.task
+    val capture: StateFlow<CaptureStatus> = LightRuntime.capture
+    val capturePreview: StateFlow<Bitmap?> = LightRuntime.capturePreview
     val discovery = HyperionDiscovery(application)
 
     private val _state = MutableStateFlow<HyperionState?>(null)
@@ -122,6 +126,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearMessage() { _message.value = null }
+
+    fun say(text: String) { _message.value = text }
+
+    fun setSyncFps(fps: Int) = store.update { it.copy(syncFps = fps) }
 
     fun refresh() { viewModelScope.launch { refreshNow() } }
 

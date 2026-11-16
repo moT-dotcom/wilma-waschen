@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Build
 import de.kinolicht.core.AppConfig
 import de.kinolicht.core.ConnectionSettings
@@ -83,7 +84,23 @@ object LightRuntime {
 
     /** Beschreibung eines laufenden Übergangs, z. B. „Lichtwecker 40 %“. */
     val task = MutableStateFlow<String?>(null)
+
+    /** Zustand des Bild-Sync (Bildschirmaufnahme → Hyperion). */
+    val capture = MutableStateFlow(CaptureStatus())
+
+    /** Letztes aufgenommenes Bild als Vorschau. */
+    val capturePreview = MutableStateFlow<Bitmap?>(null)
 }
+
+data class CaptureStatus(
+    val running: Boolean = false,
+    val fps: Int = 0,
+    /** Bleibt die Aufnahme gerade dauerhaft schwarz? */
+    val black: Boolean = false,
+    val seconds: Int = 0,
+    val blackSeconds: Int = 0,
+    val error: String? = null,
+)
 
 fun ConnectionSettings.newClient(readTimeoutMs: Int = 5000) =
     HyperionClient(host = host.trim(), port = port, token = token, instance = instance, readTimeoutMs = readTimeoutMs)

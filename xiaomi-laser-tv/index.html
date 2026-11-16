@@ -347,11 +347,16 @@ adb -s 192.168.178.50:5555 shell "settings list global | grep -iE 'memc|motion'"
     <div class="card"><h4>🎬 Szenen</h4><p>Film, Pause, Abend, Kerzenschein, Party – oder eigene aus Farbe, Verlauf oder Effekt.</p></div>
     <div class="card"><h4>🎨 Farben &amp; Verläufe</h4><p>Palette, Weißtöne, Feinwahl und mehrfarbige Verläufe rund um die Leinwand. Leuchtet sofort.</p></div>
     <div class="card"><h4>⏰ Zeitplan</h4><p>Nach Uhrzeit oder Sonnenuntergang, Lichtwecker mit simuliertem Sonnenaufgang, sanftes Ausblenden.</p></div>
+    <div class="card"><h4>📺 Bild-Sync</h4><p>LEDs folgen dem Bild (Ambilight) – für alles, was Android selbst zeichnet. Beim HDMI-Eingang meist schwarz, siehe Test.</p></div>
     <div class="card"><h4>🤖 Automatik</h4><p>LEDs gehen mit dem Beamer an und aus, abends mit anderer Szene. Einschlaf-Timer inklusive.</p></div>
   </div>
   <h3>Installation</h3>
   <div class="code"><pre>./40-install-kino-licht.sh 192.168.178.50</pre></div>
   <p>Lädt die neueste Version, installiert sie und nimmt sie von der Energiesparsteuerung aus. Danach am Beamer <b>Verbindung → Im Netzwerk suchen</b>. Läuft Hyperion mit API-Schutz, holt <b>Token automatisch anfordern</b> den Zugang – einfach in der Hyperion-Weboberfläche bestätigen.</p>
+  <h3>Bild-Sync testen</h3>
+  <p>PicCap gibt es nur für LG-Fernseher (webOS). Das Gegenstück für Android steckt in Kino-Licht unter <b>Bild-Sync</b>. Ob dein Beamer das Apple-TV-Bild an Aufnahmen herausgibt, prüft dieses Skript – vorher am Apple TV etwas Helles abspielen:</p>
+  <div class="code"><pre>./50-capture-probe.sh 192.168.178.50</pre></div>
+  <p>Meldet es „Schwarz“, funktioniert der Bild-Sync nur mit Apps auf dem Beamer selbst. Die App zeigt dasselbe an: „seit … aktiv, davon … schwarz“.</p>
   <div class="callout">
     <strong>Tipp für Kurzdistanzbeamer</strong>
     Helles Licht an der Wand senkt den Kontrast auf der Leinwand. Die Szene „Film“ ist deshalb bewusst nur ein dezentes warmes Glimmen (8 %).

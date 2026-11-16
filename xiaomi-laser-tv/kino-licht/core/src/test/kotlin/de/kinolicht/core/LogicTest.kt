@@ -194,7 +194,7 @@ class LightControllerTest {
         override suspend fun serverInfo() = state.also { calls += "serverinfo" }
         override suspend fun setColor(color: Rgb, priority: Int) { calls += "color ${color.hex} @$priority" }
         override suspend fun setEffect(name: String, priority: Int) { calls += "effect $name" }
-        override suspend fun setImage(width: Int, height: Int, rgb: ByteArray, priority: Int, name: String) { calls += "image ${width}x$height" }
+        override suspend fun setImage(width: Int, height: Int, rgb: ByteArray, priority: Int, name: String, durationMs: Int?) { calls += "image ${width}x$height" }
         override suspend fun clear(priority: Int) { calls += "clear $priority" }
         override suspend fun setComponent(component: String, enabled: Boolean) { calls += "component $component=$enabled" }
         override suspend fun setBrightness(brightness: Int) { calls += "brightness $brightness" }

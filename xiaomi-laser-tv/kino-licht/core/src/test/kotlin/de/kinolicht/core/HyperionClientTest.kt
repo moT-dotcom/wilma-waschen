@@ -69,6 +69,10 @@ class HyperionClientTest {
         assertEquals("AQIDBAUG", image.str("imagedata"))
         assertEquals(2, image["imagewidth"]!!.jsonPrimitive.int)
         assertEquals(1, image["imageheight"]!!.jsonPrimitive.int)
+        assertEquals(null, image["duration"], "ohne Dauer bleibt das Bild stehen")
+
+        client.setImage(1, 1, byteArrayOf(1, 2, 3), 51, "Sync", durationMs = 5000)
+        assertEquals(5000, server.requests.last()["duration"]!!.jsonPrimitive.int)
     }
 
     @Test

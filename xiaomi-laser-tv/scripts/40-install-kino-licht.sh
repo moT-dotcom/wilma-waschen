@@ -27,6 +27,8 @@ sh_tv dumpsys deviceidle whitelist +$PKG >/dev/null 2>&1 && ok "Von der Energies
 sh_tv appops set $PKG SCHEDULE_EXACT_ALARM allow >/dev/null 2>&1 || true
 sh_tv appops set $PKG RUN_IN_BACKGROUND allow >/dev/null 2>&1 || true
 sh_tv appops set $PKG RUN_ANY_IN_BACKGROUND allow >/dev/null 2>&1 || true
+# Bild-Sync: Bildschirmaufnahme ohne Rückfrage erlauben (sonst fragt Android bei jedem Start).
+sh_tv appops set $PKG PROJECT_MEDIA allow >/dev/null 2>&1 || true
 
 sh_tv am start -n "$PKG/de.kinolicht.app.ui.MainActivity" >/dev/null
 ok "App gestartet – jetzt am Beamer unter „Verbindung“ auf „Im Netzwerk suchen“ drücken."

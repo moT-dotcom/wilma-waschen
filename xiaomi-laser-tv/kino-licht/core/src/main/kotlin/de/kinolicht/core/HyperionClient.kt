@@ -35,7 +35,8 @@ interface HyperionApi {
     suspend fun serverInfo(): HyperionState
     suspend fun setColor(color: Rgb, priority: Int)
     suspend fun setEffect(name: String, priority: Int)
-    suspend fun setImage(width: Int, height: Int, rgb: ByteArray, priority: Int, name: String)
+    /** [durationMs]: Bild verfällt danach von selbst (null = bleibt bis zum Löschen der Priorität). */
+    suspend fun setImage(width: Int, height: Int, rgb: ByteArray, priority: Int, name: String, durationMs: Int? = null)
     suspend fun clear(priority: Int)
     suspend fun setComponent(component: String, enabled: Boolean)
     suspend fun setBrightness(brightness: Int)
@@ -146,7 +147,7 @@ class HyperionClient(
         })
     }
 
-    override suspend fun setImage(width: Int, height: Int, rgb: ByteArray, priority: Int, name: String) {
+    override suspend fun setImage(width: Int, height: Int, rgb: ByteArray, priority: Int, name: String, durationMs: Int?) {
         require(rgb.size == width * height * 3) { "Bildgröße passt nicht zu ${width}x$height" }
         request(buildJsonObject {
             put("command", "image")
@@ -156,6 +157,7 @@ class HyperionClient(
             put("priority", priority)
             put("origin", origin)
             put("name", name)
+            if (durationMs != null) put("duration", durationMs)
         })
     }
 

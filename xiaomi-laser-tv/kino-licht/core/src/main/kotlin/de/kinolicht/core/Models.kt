@@ -153,6 +153,8 @@ data class AppConfig(
     val lastScene: Scene? = null,
     /** Zuletzt gesetzte Helligkeit, um sie nach dem Ausblenden wiederherzustellen. */
     val userBrightness: Int = 100,
+    /** Bilder pro Sekunde beim Bild-Sync. */
+    val syncFps: Int = 15,
 ) {
     fun scene(id: String?): Scene? = scenes.firstOrNull { it.id == id }
 
