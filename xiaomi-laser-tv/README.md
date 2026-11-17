@@ -10,6 +10,7 @@ mit Root Directory `xiaomi-laser-tv` deployen oder lokal im Browser öffnen).
 
 ```bash
 cd scripts
+./01-optimize-all.sh 192.168.178.50 --apply   # alles auf einmal (Schritte unten einzeln)
 ./00-inventory.sh   192.168.178.50          # nur lesen: Modell, Pakete, MEMC-Hinweise
 ./10-debloat.sh     192.168.178.50          # Probelauf
 ./10-debloat.sh     192.168.178.50 --apply  # ausführen (Profile safe + xiaomi)
@@ -22,6 +23,7 @@ cd scripts
 | Pfad | Inhalt |
 | --- | --- |
 | `scripts/lib.sh` | ADB-Verbindung, Schutzliste (System, HDMI, Launcher …) |
+| `scripts/01-optimize-all.sh` | **Ein-Klick:** Inventur + Entschlacken + Performance nacheinander, zeigt am Ende die Kino-Einstellungen |
 | `scripts/00-inventory.sh` | Inventur, schreibt `backup/inventory-*.txt` |
 | `scripts/10-debloat.sh` | deaktiviert Pakete nach Profil, protokolliert in `backup/changes-*.log` |
 | `scripts/20-performance.sh` | Settings-Tweaks, sichert Originalwerte in `backup/settings-*.txt` |
@@ -31,6 +33,11 @@ cd scripts
 | `scripts/99-restore.sh` | macht beides rückgängig, auch einzeln pro Paket |
 | `packages/*.txt` | Profile `safe`, `xiaomi`, `optional` |
 | `kino-licht/` | Android-TV-App zur Steuerung von Hyperion.ng ([README](kino-licht/README.md)) |
+
+## Beste Kino-Parameter
+
+Fertige Einstellwerte für eine kinoähnliche Wiedergabe (Apple TV + Beamer):
+siehe [CINEMA.md](CINEMA.md). `01-optimize-all.sh` zeigt sie am Ende ebenfalls an.
 
 ## Grenzen
 
